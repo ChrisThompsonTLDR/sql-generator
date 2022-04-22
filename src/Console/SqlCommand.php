@@ -4,6 +4,7 @@ use Froiden\SqlGenerator\SqlFormatter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 class SqlCommand extends Command {
@@ -21,10 +22,27 @@ class SqlCommand extends Command {
         // queries against the database returning the array of raw SQL statements
         // that would get fired against the database system for this migration.
         $db = $migrator->resolveConnection(null);
-        $migrator->requireFiles($migrations = $migrator->getMigrationFiles(base_path().'/database/migrations'));
+
+        $sourceDirectory = database_path(
+            Str::of('migrations')
+                ->append('/')
+                ->append(config('sql_generator.sourceDirectory'))
+                ->replace('//', '/')
+        );
+
+        $migrator->requireFiles($migrations = $migrator->getMigrationFiles($sourceDirectory));
         //
         $sql = "-- convert Laravel migrations to raw SQL scripts --\n";
         foreach($migrations as $migration) {
+            // should we ignore this
+            if (!empty(config('sql_generator.ignore'))) {
+                $filename = last(explode('/', $migration));
+
+                if (in_array($filename, config('sql_generator.ignore'))) {
+                    continue;
+                }
+            }
+
             // First we will resolve a "real" instance of the migration class from this
             // migration file name. Once we have the instances we can run the actual
             // command such as "up" or "down", or we can just simulate the action.

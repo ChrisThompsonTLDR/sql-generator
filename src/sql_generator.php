@@ -7,4 +7,14 @@ return [
      */
     'defaultDirectory' => database_path('sql'),
 
-    ];
+    /**
+     * Allow migrations from other directories
+     */
+    'sourceDirectory' => null,
+
+    /**
+     * Migration filenames to ignore
+     */
+    'ignore' => [],
+
+];
