@@ -16,5 +16,12 @@
     "require": {
         "laravel/framework": ">= 5.3"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Froiden\\SqlGenerator\\SqlGeneratorServiceProvider"
+            ]
+        }
+    }
 }
